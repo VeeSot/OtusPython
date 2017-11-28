@@ -1,2 +1,2 @@
-# OtusPython
-Python Developer course. 2017-11
+# Otus course "Python Developer"
+Version 2017-11
