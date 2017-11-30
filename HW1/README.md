@@ -2,7 +2,7 @@
 
 Analyze nginx log, collect most slowly requests and build HTML-report
 
-For test running, please type into console: _python3 tests/test_basic.py_
+For test running, please type into console: _python3 tests/test_basic.py_ and _python3 tests/test_errors.py_
 
 For run in standard mode - use: _python3 log_analyzer.py_
 
