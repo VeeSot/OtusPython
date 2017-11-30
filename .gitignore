@@ -1,3 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 *.pyc
+/HW1/tests/assets/analyzer.log
+/HW1/tests/assets/local_conf.conf
