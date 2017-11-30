@@ -1,26 +1,26 @@
-[2017.11.30 18:18:26] I Log analyzer run
-[2017.11.30 18:18:26] I Nginx log analyze was started
-[2017.11.30 18:18:26] I Nginx log analyze was finished
-[2017.11.30 18:18:26] I Make daily report from template
-[2017.11.30 18:18:26] I Daily report was wrote
-[2017.11.30 18:18:26] I Log analyzer stopped
-[2017.11.30 18:18:26] I Log analyzer run
-[2017.11.30 18:18:26] I Log analyzer stopped
-[2017.11.30 18:18:26] I Log analyzer run
-[2017.11.30 18:18:26] I Nginx log analyze was started
-[2017.11.30 18:18:26] I Nginx log analyze was finished
-[2017.11.30 18:18:26] I Make daily report from template
-[2017.11.30 18:18:26] I Daily report was wrote
-[2017.11.30 18:18:26] I Log analyzer stopped
-[2017.11.30 18:18:32] I Log analyzer run
-[2017.11.30 18:18:32] E Sorry, directory /tmp/any wasn't found
-[2017.11.30 18:18:32] I Log analyzer stopped
-[2017.11.30 18:18:32] I Log analyzer run
-[2017.11.30 18:18:32] E Not found logs in directory /tmp
-[2017.11.30 18:18:32] I Log analyzer stopped
-[2017.11.30 18:18:32] I Log analyzer run
-[2017.11.30 18:18:32] I Nginx log analyze was started
-[2017.11.30 18:18:32] E EXCEPTION IN (/home/user/devel/HW/HW1/log_analyzer.py, LINE 224 "slow_requests = parse_log(about_last_log.path)"): 'utf-8' codec can't decode byte 0x8b in position 1: invalid start byte
+[2017.11.30 18:20:43] I Log analyzer run
+[2017.11.30 18:20:43] I Nginx log analyze was started
+[2017.11.30 18:20:43] I Nginx log analyze was finished
+[2017.11.30 18:20:43] I Make daily report from template
+[2017.11.30 18:20:43] I Daily report was wrote
+[2017.11.30 18:20:43] I Log analyzer stopped
+[2017.11.30 18:20:43] I Log analyzer run
+[2017.11.30 18:20:43] I Log analyzer stopped
+[2017.11.30 18:20:43] I Log analyzer run
+[2017.11.30 18:20:43] I Nginx log analyze was started
+[2017.11.30 18:20:43] I Nginx log analyze was finished
+[2017.11.30 18:20:43] I Make daily report from template
+[2017.11.30 18:20:43] I Daily report was wrote
+[2017.11.30 18:20:43] I Log analyzer stopped
+[2017.11.30 18:20:50] I Log analyzer run
+[2017.11.30 18:20:50] E Sorry, directory /tmp/any wasn't found
+[2017.11.30 18:20:50] I Log analyzer stopped
+[2017.11.30 18:20:50] I Log analyzer run
+[2017.11.30 18:20:50] E Not found logs in directory /tmp
+[2017.11.30 18:20:50] I Log analyzer stopped
+[2017.11.30 18:20:50] I Log analyzer run
+[2017.11.30 18:20:50] I Nginx log analyze was started
+[2017.11.30 18:20:50] E EXCEPTION IN (/home/user/devel/HW/HW1/log_analyzer.py, LINE 224 "slow_requests = parse_log(about_last_log.path)"): 'utf-8' codec can't decode byte 0x8b in position 1: invalid start byte
 Traceback (most recent call last):
   File "/home/user/devel/HW/HW1/log_analyzer.py", line 224, in main
     slow_requests = parse_log(about_last_log.path)
@@ -31,12 +31,12 @@ Traceback (most recent call last):
   File "/usr/lib/python3.5/codecs.py", line 321, in decode
     (result, consumed) = self._buffer_decode(data, self.errors, final)
 UnicodeDecodeError: 'utf-8' codec can't decode byte 0x8b in position 1: invalid start byte
-[2017.11.30 18:18:32] I Log analyzer stopped
-[2017.11.30 18:18:32] I Log analyzer run
-[2017.11.30 18:18:32] I Nginx log analyze was started
-[2017.11.30 18:18:32] I Row Erm... is missed
-[2017.11.30 18:18:32] I Row Blah-blah is missed
-[2017.11.30 18:18:32] I Nginx log analyze was finished
-[2017.11.30 18:18:32] I Make daily report from template
-[2017.11.30 18:18:32] I Daily report was wrote
-[2017.11.30 18:18:32] I Log analyzer stopped
+[2017.11.30 18:20:50] I Log analyzer stopped
+[2017.11.30 18:20:51] I Log analyzer run
+[2017.11.30 18:20:51] I Nginx log analyze was started
+[2017.11.30 18:20:51] I Row Erm... is missed
+[2017.11.30 18:20:51] I Row Blah-blah is missed
+[2017.11.30 18:20:51] I Nginx log analyze was finished
+[2017.11.30 18:20:51] I Make daily report from template
+[2017.11.30 18:20:51] I Daily report was wrote
+[2017.11.30 18:20:51] I Log analyzer stopped
