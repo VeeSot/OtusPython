@@ -1,6 +1,0 @@
-# Created by .ignore support plugin (hsz.mobi)
-.idea
-__pycache__
-/HW1/tests/assets/local_conf.conf
-*analyzer.log
-*.ts
