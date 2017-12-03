@@ -1,0 +1,137 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>rbui log analysis report</title>
+  <meta name="description" content="rbui log analysis report">
+  <style type="text/css">
+    html, body {
+      background-color: black;
+    }
+    th {
+      text-align: center;
+      color: silver;
+      font-style: bold;
+      padding: 5px;
+      cursor: pointer;
+    }
+    table {
+      width: auto;
+      border-collapse: collapse;
+      margin: 1%;
+      color: silver;
+    }
+    td {
+      text-align: right;
+      font-size: 1.1em;
+      padding: 5px;
+    }
+    .report-table-body-cell-url {
+      text-align: left;
+      width: 20%;
+    }
+    .clipped {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow:hidden !important;
+      max-width: 700px;
+      word-wrap: break-word;
+      display:inline-block;
+    }
+    .url {
+      cursor: pointer;
+      color: #729FCF;
+    }
+    .alert {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <table border="1" class="report-table">
+  <thead>
+    <tr class="report-table-header-row">
+    </tr>
+  </thead>
+  <tbody class="report-table-body">
+  </tbody>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/jquery.tablesorter.min.js"></script> 
+  <script type="text/javascript">
+  !function($) {
+    var table = [{'time_avg': 13.894, 'count': 19, 'time_sum': 263.977, 'time_max': 19.912029042349427, 'url': '/gamhi5/cahlwk6/h', 'time_med': 13.506, 'time_perc': 0.119, 'count_perc': 0.09}, {'time_avg': 12.988, 'count': 20, 'time_sum': 259.758, 'time_max': 19.517250928450128, 'url': '/bfekfzfm/2/jbk', 'time_med': 12.677, 'time_perc': 0.117, 'count_perc': 0.095}, {'time_avg': 14.391, 'count': 18, 'time_sum': 259.046, 'time_max': 19.789341315029368, 'url': '/i4hozmz/nyl/q4yz7bpj', 'time_med': 15.594, 'time_perc': 0.117, 'count_perc': 0.085}, {'time_avg': 12.907, 'count': 20, 'time_sum': 258.134, 'time_max': 20.0, 'url': '/zcg2f2z/p/9w40je', 'time_med': 15.437, 'time_perc': 0.116, 'count_perc': 0.095}, {'time_avg': 12.77, 'count': 20, 'time_sum': 255.397, 'time_max': 20.0, 'url': '/r58vs3/hwrtszzc/8smwg', 'time_med': 13.845, 'time_perc': 0.115, 'count_perc': 0.095}, {'time_avg': 13.349, 'count': 19, 'time_sum': 253.626, 'time_max': 19.43655897099457, 'url': '/tdo65/4b15/iz1yza', 'time_med': 14.875, 'time_perc': 0.114, 'count_perc': 0.09}, {'time_avg': 13.303, 'count': 19, 'time_sum': 252.75, 'time_max': 19.891302625747887, 'url': '/zxmrtj/2urcj7/l1odsem', 'time_med': 14.681, 'time_perc': 0.114, 'count_perc': 0.09}, {'time_avg': 12.547, 'count': 20, 'time_sum': 250.945, 'time_max': 20.0, 'url': '/8nn/eriq/z3', 'time_med': 13.012, 'time_perc': 0.113, 'count_perc': 0.095}, {'time_avg': 12.427, 'count': 20, 'time_sum': 248.537, 'time_max': 19.6993513300528, 'url': '/5xiaa/i1/8', 'time_med': 13.64, 'time_perc': 0.112, 'count_perc': 0.095}, {'time_avg': 12.424, 'count': 20, 'time_sum': 248.473, 'time_max': 19.072435142145984, 'url': '/n/cyruj/9', 'time_med': 12.704, 'time_perc': 0.112, 'count_perc': 0.095}, {'time_avg': 12.402, 'count': 20, 'time_sum': 248.037, 'time_max': 19.735676074568755, 'url': '/qr71t/q59p1kd/0rup6r', 'time_med': 13.282, 'time_perc': 0.112, 'count_perc': 0.095}, {'time_avg': 12.282, 'count': 20, 'time_sum': 245.636, 'time_max': 18.398658150241243, 'url': '/5ggp/r/vv6o1el', 'time_med': 14.4, 'time_perc': 0.111, 'count_perc': 0.095}, {'time_avg': 12.247, 'count': 20, 'time_sum': 244.943, 'time_max': 18.83998551083879, 'url': '/7n/wgag/mnz31', 'time_med': 12.726, 'time_perc': 0.11, 'count_perc': 0.095}, {'time_avg': 12.825, 'count': 19, 'time_sum': 243.68, 'time_max': 19.70323172986606, 'url': '/948jt8/gaay5yj3/q', 'time_med': 14.819, 'time_perc': 0.11, 'count_perc': 0.09}, {'time_avg': 12.163, 'count': 20, 'time_sum': 243.26, 'time_max': 18.846248960892297, 'url': '/r/ujnsrxo0/o4wb', 'time_med': 12.555, 'time_perc': 0.11, 'count_perc': 0.095}, {'time_avg': 12.789, 'count': 19, 'time_sum': 242.991, 'time_max': 19.683751744186296, 'url': '/mlz/0vvz8/9zdjcmnt', 'time_med': 12.716, 'time_perc': 0.109, 'count_perc': 0.09}, {'time_avg': 12.145, 'count': 20, 'time_sum': 242.901, 'time_max': 20.0, 'url': '/h0ih/sy/sy5', 'time_med': 13.423, 'time_perc': 0.109, 'count_perc': 0.095}, {'time_avg': 12.744, 'count': 19, 'time_sum': 242.141, 'time_max': 19.21549007173966, 'url': '/m0/53w86n/agern5', 'time_med': 14.091, 'time_perc': 0.109, 'count_perc': 0.09}, {'time_avg': 12.041, 'count': 20, 'time_sum': 240.829, 'time_max': 19.716853898323404, 'url': '/s27sr/0p/yubjimp', 'time_med': 15.511, 'time_perc': 0.108, 'count_perc': 0.095}, {'time_avg': 12.036, 'count': 20, 'time_sum': 240.724, 'time_max': 19.00475324613967, 'url': '/kq1mdzd5/bwy/paodk4m', 'time_med': 12.565, 'time_perc': 0.108, 'count_perc': 0.095}, {'time_avg': 12.65, 'count': 19, 'time_sum': 240.347, 'time_max': 19.255280620547204, 'url': '/0mf2ybxz/36g8/2tcyllp0', 'time_med': 13.461, 'time_perc': 0.108, 'count_perc': 0.09}, {'time_avg': 12.591, 'count': 19, 'time_sum': 239.225, 'time_max': 18.0, 'url': '/tg4j/sw0s7jxz/t', 'time_med': 13.174, 'time_perc': 0.108, 'count_perc': 0.09}, {'time_avg': 11.951, 'count': 20, 'time_sum': 239.024, 'time_max': 20.0, 'url': '/38kf4/17/w4zex', 'time_med': 10.17, 'time_perc': 0.108, 'count_perc': 0.095}, {'time_avg': 12.555, 'count': 19, 'time_sum': 238.551, 'time_max': 17.906809754084517, 'url': '/g1mk/kn/kx83', 'time_med': 13.261, 'time_perc': 0.107, 'count_perc': 0.09}, {'time_avg': 11.898, 'count': 20, 'time_sum': 237.953, 'time_max': 19.8761070328147, 'url': '/0tf36o/l27w4f/tp3t', 'time_med': 12.479, 'time_perc': 0.107, 'count_perc': 0.095}, {'time_avg': 11.792, 'count': 20, 'time_sum': 235.831, 'time_max': 19.84093653354481, 'url': '/8w6af1/a/u', 'time_med': 11.874, 'time_perc': 0.106, 'count_perc': 0.095}, {'time_avg': 11.779, 'count': 20, 'time_sum': 235.587, 'time_max': 19.37576453843694, 'url': '/rdfuad5/c/1kv1w', 'time_med': 13.657, 'time_perc': 0.106, 'count_perc': 0.095}, {'time_avg': 11.779, 'count': 20, 'time_sum': 235.573, 'time_max': 20.0, 'url': '/smnand8/s2/r0f9', 'time_med': 12.95, 'time_perc': 0.106, 'count_perc': 0.095}, {'time_avg': 11.771, 'count': 20, 'time_sum': 235.427, 'time_max': 19.671853018911637, 'url': '/2x/y99/jz1btn1', 'time_med': 10.168, 'time_perc': 0.106, 'count_perc': 0.095}, {'time_avg': 12.388, 'count': 19, 'time_sum': 235.378, 'time_max': 19.16044904431114, 'url': '/ifwa23yu/svjvdqq1/t97e1rlx', 'time_med': 14.761, 'time_perc': 0.106, 'count_perc': 0.09}, {'time_avg': 13.836, 'count': 17, 'time_sum': 235.22, 'time_max': 20.0, 'url': '/k6b0/lsu/77u', 'time_med': 13.3, 'time_perc': 0.106, 'count_perc': 0.08}, {'time_avg': 13.055, 'count': 18, 'time_sum': 234.998, 'time_max': 20.0, 'url': '/sjf4u2h/r/8s3o', 'time_med': 14.132, 'time_perc': 0.106, 'count_perc': 0.085}, {'time_avg': 12.329, 'count': 19, 'time_sum': 234.244, 'time_max': 19.77797217539567, 'url': '/qe/ox45lez9/ieozq', 'time_med': 12.812, 'time_perc': 0.106, 'count_perc': 0.09}, {'time_avg': 12.283, 'count': 19, 'time_sum': 233.374, 'time_max': 17.774853364797032, 'url': '/zlww/qzfm/5szs', 'time_med': 13.88, 'time_perc': 0.105, 'count_perc': 0.09}, {'time_avg': 11.652, 'count': 20, 'time_sum': 233.049, 'time_max': 19.995148369750638, 'url': '/d74q0n1/bho797h/8llb', 'time_med': 13.365, 'time_perc': 0.105, 'count_perc': 0.095}, {'time_avg': 13.686, 'count': 17, 'time_sum': 232.664, 'time_max': 19.785424691906353, 'url': '/kkb93se/j/tvlav9', 'time_med': 15.172, 'time_perc': 0.105, 'count_perc': 0.08}, {'time_avg': 12.24, 'count': 19, 'time_sum': 232.557, 'time_max': 19.72863108774174, 'url': '/go5z/s28iqmc/wm29h36', 'time_med': 13.935, 'time_perc': 0.105, 'count_perc': 0.09}, {'time_avg': 11.622, 'count': 20, 'time_sum': 232.45, 'time_max': 18.7815765891153, 'url': '/t/vqvpz/o2s9n05', 'time_med': 11.216, 'time_perc': 0.105, 'count_perc': 0.095}, {'time_avg': 12.904, 'count': 18, 'time_sum': 232.265, 'time_max': 19.671442813903344, 'url': '/6nlqs/emnh/6pnq1ibo', 'time_med': 14.32, 'time_perc': 0.105, 'count_perc': 0.085}, {'time_avg': 12.212, 'count': 19, 'time_sum': 232.036, 'time_max': 19.352536747544722, 'url': '/fvhdxk7/10av/vn', 'time_med': 13.465, 'time_perc': 0.105, 'count_perc': 0.09}, {'time_avg': 11.534, 'count': 20, 'time_sum': 230.689, 'time_max': 19.542206228248062, 'url': '/s8/npms4/9odce', 'time_med': 10.918, 'time_perc': 0.104, 'count_perc': 0.095}, {'time_avg': 13.567, 'count': 17, 'time_sum': 230.643, 'time_max': 19.995166690762524, 'url': '/l9ley/fr3a7c5/8', 'time_med': 14.2, 'time_perc': 0.104, 'count_perc': 0.08}, {'time_avg': 12.127, 'count': 19, 'time_sum': 230.415, 'time_max': 19.476607651406308, 'url': '/u3/opj/g3', 'time_med': 10.863, 'time_perc': 0.104, 'count_perc': 0.09}, {'time_avg': 12.116, 'count': 19, 'time_sum': 230.201, 'time_max': 19.999539062489298, 'url': '/7rayrst/0ku1ybx/htk', 'time_med': 13.63, 'time_perc': 0.104, 'count_perc': 0.09}, {'time_avg': 12.761, 'count': 18, 'time_sum': 229.692, 'time_max': 19.527767366381035, 'url': '/iidz11q/su/vut3f', 'time_med': 13.71, 'time_perc': 0.103, 'count_perc': 0.085}, {'time_avg': 11.456, 'count': 20, 'time_sum': 229.115, 'time_max': 18.5451313474488, 'url': '/1uk7injd/usl8/gudt9v0', 'time_med': 10.988, 'time_perc': 0.103, 'count_perc': 0.095}, {'time_avg': 11.455, 'count': 20, 'time_sum': 229.104, 'time_max': 18.863944946506287, 'url': '/364/3v3/13j9x0fc', 'time_med': 11.936, 'time_perc': 0.103, 'count_perc': 0.095}, {'time_avg': 12.004, 'count': 19, 'time_sum': 228.079, 'time_max': 20.0, 'url': '/q/uzr11uj/xxrt', 'time_med': 13.371, 'time_perc': 0.103, 'count_perc': 0.09}, {'time_avg': 12.003, 'count': 19, 'time_sum': 228.054, 'time_max': 18.239119918935714, 'url': '/bxu2y5h/xco/xstk7x34', 'time_med': 12.882, 'time_perc': 0.103, 'count_perc': 0.09}, {'time_avg': 12.003, 'count': 19, 'time_sum': 228.052, 'time_max': 20.0, 'url': '/g/3ywilmgy/ykv', 'time_med': 12.396, 'time_perc': 0.103, 'count_perc': 0.09}, {'time_avg': 11.358, 'count': 20, 'time_sum': 227.159, 'time_max': 18.809073280467352, 'url': '/tet/a4/90', 'time_med': 10.728, 'time_perc': 0.102, 'count_perc': 0.095}, {'time_avg': 11.353, 'count': 20, 'time_sum': 227.063, 'time_max': 19.20108870444631, 'url': '/w/27ahh/fb', 'time_med': 11.952, 'time_perc': 0.102, 'count_perc': 0.095}, {'time_avg': 11.943, 'count': 19, 'time_sum': 226.912, 'time_max': 18.612455445275565, 'url': '/0qs5ry1/0y1ql4/vdquvnb', 'time_med': 13.216, 'time_perc': 0.102, 'count_perc': 0.09}, {'time_avg': 11.93, 'count': 19, 'time_sum': 226.679, 'time_max': 19.414038798030322, 'url': '/vi32ky/f1tvgivd/kg2cn', 'time_med': 12.649, 'time_perc': 0.102, 'count_perc': 0.09}, {'time_avg': 11.888, 'count': 19, 'time_sum': 225.865, 'time_max': 19.63036981031992, 'url': '/jl3njr/11cmqhsn/sjiail', 'time_med': 12.41, 'time_perc': 0.102, 'count_perc': 0.09}, {'time_avg': 11.249, 'count': 20, 'time_sum': 224.987, 'time_max': 19.368158396313124, 'url': '/qsvfu/xlnom/3', 'time_med': 11.593, 'time_perc': 0.101, 'count_perc': 0.095}, {'time_avg': 12.472, 'count': 18, 'time_sum': 224.492, 'time_max': 19.513509764971968, 'url': '/ll8/5xirj/8n', 'time_med': 13.968, 'time_perc': 0.101, 'count_perc': 0.085}, {'time_avg': 11.206, 'count': 20, 'time_sum': 224.121, 'time_max': 19.22371844808976, 'url': '/54/u/3', 'time_med': 13.116, 'time_perc': 0.101, 'count_perc': 0.095}, {'time_avg': 11.175, 'count': 20, 'time_sum': 223.5, 'time_max': 19.74265090745321, 'url': '/w/9fgfx/h5010', 'time_med': 10.031, 'time_perc': 0.101, 'count_perc': 0.095}, {'time_avg': 11.084, 'count': 20, 'time_sum': 221.689, 'time_max': 19.248354721633156, 'url': '/7o7ftiu/t1waphu0/qq', 'time_med': 11.888, 'time_perc': 0.1, 'count_perc': 0.095}, {'time_avg': 11.069, 'count': 20, 'time_sum': 221.373, 'time_max': 19.63424923208741, 'url': '/yo2rz4p/02x9q34p/5cdw', 'time_med': 11.229, 'time_perc': 0.1, 'count_perc': 0.095}, {'time_avg': 11.064, 'count': 20, 'time_sum': 221.276, 'time_max': 19.421336194426065, 'url': '/52jqgge/5ivzv1re/simex5j', 'time_med': 11.189, 'time_perc': 0.1, 'count_perc': 0.095}, {'time_avg': 12.286, 'count': 18, 'time_sum': 221.15, 'time_max': 19.70334120069476, 'url': '/l49t3c/yjrr9dar/a9ehkqy4', 'time_med': 12.404, 'time_perc': 0.1, 'count_perc': 0.085}, {'time_avg': 11.633, 'count': 19, 'time_sum': 221.034, 'time_max': 19.9187450310051, 'url': '/sz33/6/95y0zl8y', 'time_med': 13.091, 'time_perc': 0.1, 'count_perc': 0.09}, {'time_avg': 11.63, 'count': 19, 'time_sum': 220.974, 'time_max': 19.954282002583362, 'url': '/yelz6/ics4p/o', 'time_med': 14.166, 'time_perc': 0.1, 'count_perc': 0.09}, {'time_avg': 12.991, 'count': 17, 'time_sum': 220.853, 'time_max': 20.0, 'url': '/otj46/jxa4okea/atk', 'time_med': 14.731, 'time_perc': 0.099, 'count_perc': 0.08}, {'time_avg': 11.607, 'count': 19, 'time_sum': 220.525, 'time_max': 18.0, 'url': '/ifbvbp/1ypgw/9', 'time_med': 14.0, 'time_perc': 0.099, 'count_perc': 0.09}, {'time_avg': 11.003, 'count': 20, 'time_sum': 220.061, 'time_max': 18.977148217016463, 'url': '/41/17iy047/l9jdum', 'time_med': 12.481, 'time_perc': 0.099, 'count_perc': 0.095}, {'time_avg': 12.219, 'count': 18, 'time_sum': 219.948, 'time_max': 20.0, 'url': '/pi3j/t8mjc2/w', 'time_med': 14.2, 'time_perc': 0.099, 'count_perc': 0.085}, {'time_avg': 10.951, 'count': 20, 'time_sum': 219.021, 'time_max': 18.746876242812718, 'url': '/0cd/ql83w6/gmxmu', 'time_med': 10.791, 'time_perc': 0.099, 'count_perc': 0.095}, {'time_avg': 10.949, 'count': 20, 'time_sum': 218.983, 'time_max': 20.0, 'url': '/c5enakt/a/ei8g', 'time_med': 11.344, 'time_perc': 0.099, 'count_perc': 0.095}, {'time_avg': 10.941, 'count': 20, 'time_sum': 218.824, 'time_max': 19.78364541658976, 'url': '/57/k/of0i', 'time_med': 11.125, 'time_perc': 0.099, 'count_perc': 0.095}, {'time_avg': 12.853, 'count': 17, 'time_sum': 218.505, 'time_max': 19.818335030949115, 'url': '/zmwuvu0/7eeyuk/owz', 'time_med': 13.26, 'time_perc': 0.098, 'count_perc': 0.08}, {'time_avg': 11.478, 'count': 19, 'time_sum': 218.088, 'time_max': 18.0, 'url': '/mjr34n/4dfdarj/ffx', 'time_med': 12.8, 'time_perc': 0.098, 'count_perc': 0.09}, {'time_avg': 11.47, 'count': 19, 'time_sum': 217.937, 'time_max': 19.884896041796985, 'url': '/t/4/gv73', 'time_med': 11.237, 'time_perc': 0.098, 'count_perc': 0.09}, {'time_avg': 12.819, 'count': 17, 'time_sum': 217.919, 'time_max': 19.0, 'url': '/x3jhtlaa/swc0k3/qs7c', 'time_med': 13.835, 'time_perc': 0.098, 'count_perc': 0.08}, {'time_avg': 11.441, 'count': 19, 'time_sum': 217.384, 'time_max': 19.534544304913002, 'url': '/bcbg4a/8kz8s4sj/d', 'time_med': 12.784, 'time_perc': 0.098, 'count_perc': 0.09}, {'time_avg': 10.867, 'count': 20, 'time_sum': 217.341, 'time_max': 18.564745572512475, 'url': '/xxgq3usc/3lp/hjmsu', 'time_med': 11.631, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 13.582, 'count': 16, 'time_sum': 217.319, 'time_max': 19.430967394233395, 'url': '/84d14gw/wihwh56p/5dd', 'time_med': 13.898, 'time_perc': 0.098, 'count_perc': 0.076}, {'time_avg': 10.865, 'count': 20, 'time_sum': 217.3, 'time_max': 20.0, 'url': '/zrl/c/7', 'time_med': 8.973, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 12.065, 'count': 18, 'time_sum': 217.171, 'time_max': 19.784341801965148, 'url': '/iqfu/uur6m/pnu', 'time_med': 11.581, 'time_perc': 0.098, 'count_perc': 0.085}, {'time_avg': 11.414, 'count': 19, 'time_sum': 216.863, 'time_max': 19.161964055028683, 'url': '/n0ae/64jk/5q5bu2ju', 'time_med': 11.114, 'time_perc': 0.098, 'count_perc': 0.09}, {'time_avg': 10.843, 'count': 20, 'time_sum': 216.855, 'time_max': 19.800978949742316, 'url': '/4/dcmr0sce/54', 'time_med': 11.454, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 10.838, 'count': 20, 'time_sum': 216.765, 'time_max': 19.05267961546019, 'url': '/dipp8a/4llevs/w0sb', 'time_med': 10.833, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 10.831, 'count': 20, 'time_sum': 216.629, 'time_max': 20.0, 'url': '/xhb14/uf2ra/ee3', 'time_med': 11.014, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 12.033, 'count': 18, 'time_sum': 216.601, 'time_max': 19.96812378426695, 'url': '/e146ba/7/9e', 'time_med': 13.084, 'time_perc': 0.098, 'count_perc': 0.085}, {'time_avg': 10.826, 'count': 20, 'time_sum': 216.517, 'time_max': 18.259948978504777, 'url': '/u8o/fm35zkb2/o', 'time_med': 10.434, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 10.824, 'count': 20, 'time_sum': 216.48, 'time_max': 19.38103946713259, 'url': '/ffwk/9/h7w', 'time_med': 11.177, 'time_perc': 0.098, 'count_perc': 0.095}, {'time_avg': 13.519, 'count': 16, 'time_sum': 216.296, 'time_max': 19.45507558620917, 'url': '/upltj9/z042/41pa', 'time_med': 16.086, 'time_perc': 0.097, 'count_perc': 0.076}, {'time_avg': 11.381, 'count': 19, 'time_sum': 216.241, 'time_max': 19.075043960874027, 'url': '/8ao/urpxoy/iu25aj', 'time_med': 13.15, 'time_perc': 0.097, 'count_perc': 0.09}, {'time_avg': 10.79, 'count': 20, 'time_sum': 215.805, 'time_max': 19.10727225902107, 'url': '/tygc0/fjpavq/xs7g', 'time_med': 10.608, 'time_perc': 0.097, 'count_perc': 0.095}, {'time_avg': 11.974, 'count': 18, 'time_sum': 215.534, 'time_max': 18.966034173629915, 'url': '/mpjo4ait/qfuk0/7tkyb', 'time_med': 13.18, 'time_perc': 0.097, 'count_perc': 0.085}, {'time_avg': 10.776, 'count': 20, 'time_sum': 215.522, 'time_max': 19.182640862730825, 'url': '/ta78s9y/bx1ctg/2delg', 'time_med': 12.077, 'time_perc': 0.097, 'count_perc': 0.095}, {'time_avg': 11.972, 'count': 18, 'time_sum': 215.491, 'time_max': 17.15232663169749, 'url': '/a6e4hm/psoss/hrr4jzfg', 'time_med': 13.839, 'time_perc': 0.097, 'count_perc': 0.085}, {'time_avg': 10.772, 'count': 20, 'time_sum': 215.436, 'time_max': 19.842724535029447, 'url': '/vso9t3a/lj1/x4f8lhb', 'time_med': 10.35, 'time_perc': 0.097, 'count_perc': 0.095}, {'time_avg': 12.628, 'count': 17, 'time_sum': 214.671, 'time_max': 19.99469114161993, 'url': '/0ht/6ip0/umlmk', 'time_med': 12.333, 'time_perc': 0.097, 'count_perc': 0.08}, {'time_avg': 10.732, 'count': 20, 'time_sum': 214.638, 'time_max': 18.161399980557764, 'url': '/p83g6mh/w/tjrc', 'time_med': 12.8, 'time_perc': 0.097, 'count_perc': 0.095}, {'time_avg': 10.729, 'count': 20, 'time_sum': 214.579, 'time_max': 19.545833506361564, 'url': '/oquwrix/gcw/0v', 'time_med': 11.62, 'time_perc': 0.097, 'count_perc': 0.095}, {'time_avg': 10.725, 'count': 20, 'time_sum': 214.5, 'time_max': 19.54480644276879, 'url': '/gomcv55/qtp3/jxph', 'time_med': 10.518, 'time_perc': 0.097, 'count_perc': 0.095}, {'time_avg': 10.725, 'count': 20, 'time_sum': 214.498, 'time_max': 20.0, 'url': '/n3/6ok/4priyro', 'time_med': 10.276, 'time_perc': 0.097, 'count_perc': 0.095}];
+    var reportDates;
+    var columns = new Array();
+    var lastRow = 150;
+    var $table = $(".report-table-body");
+    var $header = $(".report-table-header-row");
+    var $selector = $(".report-date-selector");
+
+    $(document).ready(function() {
+      $(window).bind("scroll", bindScroll);
+        var row = table[0];
+        for (k in row) {
+          columns.push(k);
+        }
+        columns = columns.sort();
+        columns = columns.slice(columns.length -1, columns.length).concat(columns.slice(0, columns.length -1));
+        drawColumns();
+        drawRows(table.slice(0, lastRow));
+        $(".report-table").tablesorter(); 
+    });
+
+    function drawColumns() {
+      for (var i = 0; i < columns.length; i++) {
+        var $th = $("<th></th>").text(columns[i])
+                                .addClass("report-table-header-cell")
+        $header.append($th);
+      }
+    }
+
+    function drawRows(rows) {
+      for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var $row = $("<tr></tr>").addClass("report-table-body-row");
+        for (var j = 0; j < columns.length; j++) {
+          var columnName = columns[j];
+          var $cell = $("<td></td>").addClass("report-table-body-cell");
+          if (columnName == "url") {
+            var url = "https://rb.mail.ru" + row[columnName];
+            var $link = $("<a></a>").attr("href", url)
+                                    .attr("title", url)
+                                    .attr("target", "_blank")
+                                    .addClass("clipped")
+                                    .addClass("url")
+                                    .text(row[columnName]);
+            $cell.addClass("report-table-body-cell-url");
+            $cell.append($link);
+          }
+          else {
+            $cell.text(row[columnName]);
+            if (columnName == "time_avg" && row[columnName] > 0.9) {
+              $cell.addClass("alert");
+            }
+          }
+          $row.append($cell);
+        }
+        $table.append($row);
+      } 
+      $(".report-table").trigger("update"); 
+    }
+
+    function bindScroll() {
+      if($(window).scrollTop() == $(document).height() - $(window).height()) {
+        if (lastRow < 1000) {
+          drawRows(table.slice(lastRow, lastRow + 50));
+          lastRow += 50;
+        }
+      }
+    }
+
+  }(window.jQuery)
+  </script>
+</body>
+</html>

@@ -1,8 +1,6 @@
 # %load log_analyzer.py
 # !/usr/bin/env python3
 
-
-
 import argparse
 import gzip
 import json
@@ -15,12 +13,12 @@ from collections import namedtuple
 from datetime import datetime
 from json import JSONDecodeError
 from string import Template
-from typing import Optional, List, Union
+from typing import Optional, Union
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 LogInformation = namedtuple('LogInformation', 'date path')
 
-config = {
+default_config = {
     "REPORT_SIZE": 100,
     "REPORT_DIR": "./reports",
     "LOG_DIR": "./log"
@@ -129,20 +127,14 @@ def configure_logger(config: dict):
                         datefmt='%Y.%m.%d %H:%M:%S', handlers=[handler])
 
 
-def params_unification(exteranal_config=None):
+def params_unification(config):
     """Convert path to file"""
-    if exteranal_config:
-        settings = exteranal_config
-    else:
-        settings = config.copy()
-
-    for key, value in settings.items():
+    current_dir = os.getcwd()
+    for key, value in config.items():
         if isinstance(value, str) and value.startswith('./'):  # We've relative path.
             # transform relative to absolute
-            current_dir = os.getcwd()
-            settings[key] = current_dir + value[1:]
-
-    return settings
+            config[key] = current_dir + value[1:]
+    return config
 
 
 def get_path_to_last_nginx_log(path_to_logs) -> Union[None, LogInformation]:
@@ -184,26 +176,20 @@ def refresh_ts():
 
 def build_config(options):
     path_to_exteranal_config = options.config
+    config = default_config.copy()
     if path_to_exteranal_config:
         external_config = open(path_to_exteranal_config, 'r')
         try:
-            important_fields = ["REPORT_SIZE", "REPORT_DIR", "LOG_DIR"]
-            exteranal_config = json.load(external_config)
-            if set(important_fields) - set(exteranal_config.keys()):
-                # Oops, we don't have all necessary fields
-                logging.error("Please, check your config")
-                raise Exception("Please, check your config")
+            external_config = json.load(external_config)
+            config.update(external_config)
         except JSONDecodeError:
             logging.error("Please, check your config")
             raise Exception("Please, check your config")
-        return params_unification(exteranal_config=exteranal_config)
-    else:
-        return params_unification()
+    return params_unification(config)
 
 
-def parse_log(path_to_last_log):
+def parse_log(path_to_last_log, report_size):
     logging.info("Nginx log analyze was started")
-    report_size = config['REPORT_SIZE']
     slow_requests = analyze_log(path_to_last_log, report_size)
     logging.info("Nginx log analyze was finished")
     return slow_requests
@@ -219,14 +205,15 @@ def make_report(path_to_daily_report: str, slow_requests):
     return page
 
 
-def main(config):
+def main(config: dict):
     logging.info("Log analyzer run")
     about_last_log = get_path_to_last_nginx_log(config["LOG_DIR"])
     if about_last_log:
         day_of_report = datetime.strftime(about_last_log.date, '%Y.%m.%d')
         path_to_daily_report = '{0}/report-{1}.html'.format(config["REPORT_DIR"], day_of_report)
         if not os.path.exists(path_to_daily_report):
-            slow_requests = parse_log(about_last_log.path)
+            report_size = config['REPORT_SIZE']
+            slow_requests = parse_log(about_last_log.path, report_size)
             make_report(path_to_daily_report, slow_requests)
             # Report
             refresh_ts()
