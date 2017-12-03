@@ -1,27 +1,23 @@
 # %load log_analyzer.py
 # !/usr/bin/env python3
 
-# log_format ui_short '$remote_addr $remote_user $http_x_real_ip [$time_local] "$request" '
-#                     '$status $body_bytes_sent "$http_referer" '
-#                     '"$http_user_agent" "$http_x_forwarded_for" "$http_X_REQUEST_ID" "$http_X_RB_USER" '
-#                     '$request_time';
+
 
 import argparse
 import gzip
 import json
-import linecache
 import logging
 import os
 import re
 import statistics
-import sys
 import time
 from collections import namedtuple
 from datetime import datetime
 from json import JSONDecodeError
 from string import Template
-from typing import Optional
+from typing import Optional, List, Union
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 LogInformation = namedtuple('LogInformation', 'date path')
 
 config = {
@@ -31,18 +27,14 @@ config = {
 }
 
 
-def PrintException():
-    exc_type, exc_obj, tb = sys.exc_info()
-    f = tb.tb_frame
-    lineno = tb.tb_lineno
-    filename = f.f_code.co_filename
-    linecache.checkcache(filename)
-    line = linecache.getline(filename, lineno, f.f_globals)
-    return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
-
-
 def get_lats_log_file(log_dir: str) -> Optional[LogInformation]:
-    """Return newest log-file in dir"""
+    """Return newest log-file in dir
+    log_format ui_short '$remote_addr $remote_user $http_x_real_ip [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for" "$http_X_REQUEST_ID" "$http_X_RB_USER" '
+                        '$request_time';
+    
+    """
 
     file_mask = re.compile('^nginx-access-ui.log-(?P<day_of_log>\d{8})(\.gz)?$')
     # Try to find last log-file in DIR
@@ -65,8 +57,7 @@ def get_lats_log_file(log_dir: str) -> Optional[LogInformation]:
 
 
 def prepare_report(params: dict):
-    homework_dir = os.path.dirname(os.path.realpath(__file__))
-    path_to_template = '{}/report.html'.format(homework_dir)
+    path_to_template = '{}/report.html'.format(SCRIPT_DIR)
     with open(path_to_template, "r") as f:
         text_tempalte = f.read()
     page = Template(text_tempalte)
@@ -154,26 +145,41 @@ def params_unification(exteranal_config=None):
     return settings
 
 
-def get_path_to_last_nginx_log(path_to_logs):
+def get_path_to_last_nginx_log(path_to_logs) -> Union[None, LogInformation]:
     # Get path to last log-file
     if not os.path.exists(path_to_logs):
         logging.error("Sorry, directory {} wasn't found".format(path_to_logs))
         return None
-    log_info = get_lats_log_file(path_to_logs)
-    if not log_info:
+
+    file_mask = re.compile('^nginx-access-ui.log-(?P<day_of_log>\d{8})(\.gz)?$')
+    # Try to find last log-file in DIR
+    logs = os.listdir(path_to_logs)
+    valid_logs = []
+    for log in logs:
+        match = file_mask.search(log)
+        if match:  # We find valid log
+            day_of_log = datetime.strptime(match.group('day_of_log'), '%Y%m%d').date()
+            log_file = '{}/{}'.format(path_to_logs, match.string)
+            log_info = LogInformation(day_of_log, log_file)
+            valid_logs.append(log_info)
+
+    if valid_logs:
+        # We know that log have date difference, but find newest
+        valid_log = max(valid_logs, key=lambda log: log.date)
+        return valid_log
+    else:
         logging.error("Not found logs in directory {}".format(path_to_logs))
         return None
-    return log_info
 
 
-def create_or_update_ts(config):
-    ts_file = config.get('TS_FILE')
-    if ts_file:
-        ts = int(time.time())
-        with open(ts_file, "w") as f:
-            f.write(str(ts))
-        os.utime(ts_file, (ts, ts))
-        return True
+def refresh_ts():
+    """Update timestamp last report creation"""
+    ts_file = '{}/last_report_update.ts'.format(SCRIPT_DIR)
+    ts = int(time.time())
+    with open(ts_file, "w") as f:
+        f.write(str(ts))
+    os.utime(ts_file, (ts, ts))
+    logging.info("TS-file was updated")
 
 
 def build_config(options):
@@ -215,21 +221,15 @@ def make_report(path_to_daily_report: str, slow_requests):
 
 def main(config):
     logging.info("Log analyzer run")
-    try:
-        about_last_log = get_path_to_last_nginx_log(config["LOG_DIR"])
-        if about_last_log:
-            day_of_report = datetime.strftime(about_last_log.date, '%Y.%m.%d')
-            path_to_daily_report = '{0}/report-{1}.html'.format(config["REPORT_DIR"], day_of_report)
-            if not os.path.exists(path_to_daily_report):
-                slow_requests = parse_log(about_last_log.path)
-                make_report(path_to_daily_report, slow_requests)
-                # Report
-                if create_or_update_ts(config):
-                    logging.info("TS-file was updated")
-    except Exception:
-        # If something going wrong
-        e = PrintException()
-        logging.exception(e)
+    about_last_log = get_path_to_last_nginx_log(config["LOG_DIR"])
+    if about_last_log:
+        day_of_report = datetime.strftime(about_last_log.date, '%Y.%m.%d')
+        path_to_daily_report = '{0}/report-{1}.html'.format(config["REPORT_DIR"], day_of_report)
+        if not os.path.exists(path_to_daily_report):
+            slow_requests = parse_log(about_last_log.path)
+            make_report(path_to_daily_report, slow_requests)
+            # Report
+            refresh_ts()
 
     logging.info("Log analyzer stopped")
 
@@ -240,4 +240,8 @@ if __name__ == "__main__":
     options = m.parse_args()
     config = build_config(options)
     configure_logger(config)
-    main(config)
+    try:
+        main(config)
+    except Exception as e:
+        # If something going wrong
+        logging.exception(e, exc_info=True)

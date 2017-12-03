@@ -3,3 +3,4 @@
 *.pyc
 *analyzer.log
 *local_conf.conf
+*last_report_update.ts

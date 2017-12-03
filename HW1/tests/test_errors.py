@@ -82,7 +82,7 @@ class TestError(TestBaseClass):
         new_name = old_name.replace('.gz', '')
         os.rename(old_name, new_name)  # Change file extension
         self.generate_report()
-        self.assertTrue(self.check_in_log('EXCEPTION'))
+        self.assertTrue(self.check_in_log("'utf-8' codec can't decode byte"))
 
 
 if __name__ == '__main__':
