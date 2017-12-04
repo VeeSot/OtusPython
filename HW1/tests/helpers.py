@@ -79,6 +79,7 @@ class TestBaseClass(unittest.TestCase):
         self.test_config = {
             "REPORT_SIZE": 10,
             "REPORT_DIR": self.report_dir,
+            "REPORT_TEMPLATE":"{}/template.html".format(self.report_dir),
             "LOG_DIR": "/tmp".format(self.test_dir),
             "LOG_FILE": "{}/assets/analyzer.log".format(self.test_dir)
         }

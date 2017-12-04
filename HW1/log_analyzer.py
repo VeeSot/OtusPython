@@ -13,54 +13,31 @@ from collections import namedtuple
 from datetime import datetime
 from json import JSONDecodeError
 from string import Template
-from typing import Optional, Union
+from typing import Union
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 LogInformation = namedtuple('LogInformation', 'date path')
 
-default_config = {
-    "REPORT_SIZE": 100,
-    "REPORT_DIR": "./reports",
-    "LOG_DIR": "./log"
-}
 
-
-def get_lats_log_file(log_dir: str) -> Optional[LogInformation]:
-    """Return newest log-file in dir
-    log_format ui_short '$remote_addr $remote_user $http_x_real_ip [$time_local] "$request" '
-                        '$status $body_bytes_sent "$http_referer" '
-                        '"$http_user_agent" "$http_x_forwarded_for" "$http_X_REQUEST_ID" "$http_X_RB_USER" '
-                        '$request_time';
-    
-    """
-
-    file_mask = re.compile('^nginx-access-ui.log-(?P<day_of_log>\d{8})(\.gz)?$')
-    # Try to find last log-file in DIR
-    logs = os.listdir(log_dir)
-    valid_logs = []
-    for log in logs:
-        match = file_mask.search(log)
-        if match:  # We find valid log
-            day_of_log = datetime.strptime(match.group('day_of_log'), '%Y%m%d').date()
-            log_file = '{}/{}'.format(log_dir, match.string)
-            log_info = LogInformation(day_of_log, log_file)
-            valid_logs.append(log_info)
-
-    # We know that log have date difference
-    if valid_logs:
-        valid_logs = sorted(valid_logs, key=lambda log: log.date, reverse=True)
-        return valid_logs[0]
-    else:
-        return None
-
-
-def prepare_report(params: dict):
-    path_to_template = '{}/report.html'.format(SCRIPT_DIR)
+def prepare_report(params: dict, path_to_template):
     with open(path_to_template, "r") as f:
         text_tempalte = f.read()
     page = Template(text_tempalte)
     page = page.safe_substitute(params)
     return page
+
+
+def read_log(path_to_log):
+    is_gz_file = path_to_log.endswith(".gz")
+    if is_gz_file:
+        log = gzip.open(path_to_log)
+    else:
+        log = open(path_to_log)
+
+    for row in log:
+        if is_gz_file:  # gz return binary row
+            row = row.decode('utf-8')
+        yield row
 
 
 def analyze_log(path_to_log: str, report_size: int):
@@ -69,17 +46,8 @@ def analyze_log(path_to_log: str, report_size: int):
     total_time = 0
     total_req = 0
     stat = {}
-    is_gz_file = path_to_log.endswith(".gz")
-    if is_gz_file:
-        rows = gzip.open(path_to_log)
-    else:
-        rows = open(path_to_log)
-
-    for row in rows:
-        if is_gz_file:
-            # Read bytes
-            row = row.decode('utf-8')
-
+    log = read_log(path_to_log)
+    for row in log:
         matches = url_pattern.search(row)
         if matches:
             url = matches.group('url')
@@ -90,10 +58,8 @@ def analyze_log(path_to_log: str, report_size: int):
             total_req += 1
         else:
             logging.info('Row {} is missed'.format(row.strip()))
-    rows.close()
 
     for url, t_executions in stat.items():
-        # Calculate avg for serving time
         metrics = {}
         avg_time = round(statistics.mean(t_executions), 3)
         total_req_for_req = len(t_executions)
@@ -138,7 +104,13 @@ def params_unification(config):
 
 
 def get_path_to_last_nginx_log(path_to_logs) -> Union[None, LogInformation]:
-    # Get path to last log-file
+    """Return newest log-file in dir
+    log_format ui_short '$remote_addr $remote_user $http_x_real_ip [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for" "$http_X_REQUEST_ID" "$http_X_RB_USER" '
+                        '$request_time';
+
+    """
     if not os.path.exists(path_to_logs):
         logging.error("Sorry, directory {} wasn't found".format(path_to_logs))
         return None
@@ -160,27 +132,31 @@ def get_path_to_last_nginx_log(path_to_logs) -> Union[None, LogInformation]:
         valid_log = max(valid_logs, key=lambda log: log.date)
         return valid_log
     else:
-        logging.error("Not found logs in directory {}".format(path_to_logs))
+        logging.info("Not found logs in directory {}".format(path_to_logs))
         return None
 
 
-def refresh_ts():
+def refresh_ts(path_to_ts_file: str):
     """Update timestamp last report creation"""
-    ts_file = '{}/last_report_update.ts'.format(SCRIPT_DIR)
     ts = int(time.time())
-    with open(ts_file, "w") as f:
+    with open(path_to_ts_file, "w") as f:
         f.write(str(ts))
-    os.utime(ts_file, (ts, ts))
+    os.utime(path_to_ts_file, (ts, ts))
     logging.info("TS-file was updated")
 
 
 def build_config(options):
+    def parse_config(path):
+        with open(path, 'r') as f:
+            return json.load(f)
+
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    config = parse_config('{}/local_conf.conf'.format(current_dir))
+
     path_to_exteranal_config = options.config
-    config = default_config.copy()
     if path_to_exteranal_config:
-        external_config = open(path_to_exteranal_config, 'r')
         try:
-            external_config = json.load(external_config)
+            external_config = parse_config(path_to_exteranal_config)
             config.update(external_config)
         except JSONDecodeError:
             logging.error("Please, check your config")
@@ -195,11 +171,11 @@ def parse_log(path_to_last_log, report_size):
     return slow_requests
 
 
-def make_report(path_to_daily_report: str, slow_requests):
+def make_report(path_to_new_daily_report: str, path_to_template, slow_requests):
     logging.info("Make daily report from template")
-    page = prepare_report({'table_json': slow_requests})
+    page = prepare_report({'table_json': slow_requests}, path_to_template)
 
-    with open(path_to_daily_report, 'w') as f:
+    with open(path_to_new_daily_report, 'w') as f:
         f.write(page)
     logging.info("Daily report was wrote")
     return page
@@ -214,9 +190,9 @@ def main(config: dict):
         if not os.path.exists(path_to_daily_report):
             report_size = config['REPORT_SIZE']
             slow_requests = parse_log(about_last_log.path, report_size)
-            make_report(path_to_daily_report, slow_requests)
+            make_report(path_to_daily_report, config['REPORT_TEMPLATE'], slow_requests)
             # Report
-            refresh_ts()
+            refresh_ts(config['TS_FILE'])
 
     logging.info("Log analyzer stopped")
 
