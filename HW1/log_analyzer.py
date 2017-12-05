@@ -9,7 +9,7 @@ import os
 import re
 import statistics
 import time
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from datetime import datetime
 from json import JSONDecodeError
 from string import Template
@@ -45,7 +45,7 @@ def analyze_log(path_to_log: str, report_size: int):
     requests = []
     total_time = 0
     total_req = 0
-    stat = {}
+    stat = defaultdict(list)
     log = read_log(path_to_log)
     for row in log:
         matches = url_pattern.search(row)
@@ -53,7 +53,7 @@ def analyze_log(path_to_log: str, report_size: int):
             url = matches.group('url')
             # row in logfile has mark about time of execution.
             t_execution = float(matches.group('t_execution'))
-            stat.setdefault(url, []).append(t_execution)
+            stat[url].append(t_execution)
             total_time += t_execution
             total_req += 1
         else:
@@ -79,28 +79,10 @@ def analyze_log(path_to_log: str, report_size: int):
     return most_slow_requests
 
 
-def configure_logger(config: dict):
+def configure_logger(path_to_log_file):
     # Configure our logger
-    path_to_log_file = config.get('LOG_FILE')
-    if path_to_log_file:
-        # Write to file
-        handler = logging.FileHandler(path_to_log_file)
-    else:
-        # Write to stdout
-        handler = logging.StreamHandler()
-
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname).1s %(message)s',
-                        datefmt='%Y.%m.%d %H:%M:%S', handlers=[handler])
-
-
-def params_unification(config):
-    """Convert path to file"""
-    current_dir = os.getcwd()
-    for key, value in config.items():
-        if isinstance(value, str) and value.startswith('./'):  # We've relative path.
-            # transform relative to absolute
-            config[key] = current_dir + value[1:]
-    return config
+                        datefmt='%Y.%m.%d %H:%M:%S', filename=path_to_log_file)
 
 
 def get_path_to_last_nginx_log(path_to_logs) -> Union[None, LogInformation]:
@@ -145,23 +127,13 @@ def refresh_ts(path_to_ts_file: str):
     logging.info("TS-file was updated")
 
 
-def build_config(options):
-    def parse_config(path):
-        with open(path, 'r') as f:
+def build_config(path_to_config):
+    try:
+        with open(path_to_config, 'r') as f:
             return json.load(f)
-
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    config = parse_config('{}/local_conf.conf'.format(current_dir))
-
-    path_to_exteranal_config = options.config
-    if path_to_exteranal_config:
-        try:
-            external_config = parse_config(path_to_exteranal_config)
-            config.update(external_config)
-        except JSONDecodeError:
-            logging.error("Please, check your config")
-            raise Exception("Please, check your config")
-    return params_unification(config)
+    except JSONDecodeError:
+        logging.error("Please, check your config")
+        raise Exception("Please, check your config")
 
 
 def parse_log(path_to_last_log, report_size):
@@ -199,10 +171,10 @@ def main(config: dict):
 
 if __name__ == "__main__":
     m = argparse.ArgumentParser(description="Log analyzer", prog="log_analyzer")
-    m.add_argument("--config", "-c", type=str, default='', help="Program config")
+    m.add_argument("--config", "-c", type=str, default='/path/HW1/local_conf.conf', help="Program config")
     options = m.parse_args()
-    config = build_config(options)
-    configure_logger(config)
+    config = build_config(options.config)
+    configure_logger(config.get('LOG_FILE'))
     try:
         main(config)
     except Exception as e:
