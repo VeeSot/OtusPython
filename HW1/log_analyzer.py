@@ -58,7 +58,7 @@ def analyze_log(rows: Generator, report_size: int):
             bad_rows += 1
 
     if bad_rows:
-        logging.info('Were/was skipped {} row(s)'.format(bad_rows))
+        logging.info('Were/was skipped {} row(s) from {}'.format(bad_rows,bad_rows+total_matched))
 
     for url, t_executions in stat.items():
         metrics = {}
