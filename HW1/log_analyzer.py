@@ -9,7 +9,7 @@ import os
 import re
 import statistics
 import time
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, Generator
 from datetime import datetime
 from json import JSONDecodeError
 from string import Template
@@ -30,24 +30,22 @@ def prepare_report(params: dict, path_to_template):
 def read_log(path_to_log):
     is_gz_file = path_to_log.endswith(".gz")
     if is_gz_file:
-        log = gzip.open(path_to_log)
+        log = gzip.open(path_to_log, 'rt', encoding='utf-8')
     else:
         log = open(path_to_log)
 
     for row in log:
-        if is_gz_file:  # gz return binary row
-            row = row.decode('utf-8')
         yield row
 
 
-def analyze_log(path_to_log: str, report_size: int):
+def analyze_log(rows: Generator, report_size: int):
     url_pattern = re.compile('[A-Z]+\s(?P<url>\S+)\sHTTP/\d\.\d.* (?P<t_execution>\d+(\.\d+)?)')
     requests = []
     total_time = 0
-    total_req = 0
+    total_matched = 0
+    bad_rows = 0
     stat = defaultdict(list)
-    log = read_log(path_to_log)
-    for row in log:
+    for row in rows:
         matches = url_pattern.search(row)
         if matches:
             url = matches.group('url')
@@ -55,9 +53,12 @@ def analyze_log(path_to_log: str, report_size: int):
             t_execution = float(matches.group('t_execution'))
             stat[url].append(t_execution)
             total_time += t_execution
-            total_req += 1
+            total_matched += 1
         else:
-            logging.info('Row {} is missed'.format(row.strip()))
+            bad_rows += 1
+
+    if bad_rows:
+        logging.info('Were/was skipped {} row(s)'.format(bad_rows))
 
     for url, t_executions in stat.items():
         metrics = {}
@@ -71,7 +72,7 @@ def analyze_log(path_to_log: str, report_size: int):
         metrics['url'] = url
         metrics['time_med'] = round(statistics.median(t_executions), 3)
         metrics['time_perc'] = round(total_time_for_req / total_time * 100, 3)
-        metrics['count_perc'] = round(total_req_for_req / total_req * 100, 3)
+        metrics['count_perc'] = round(total_req_for_req / total_matched * 100, 3)
         requests.append(metrics)
 
     ordered_requests = sorted(requests, key=lambda request: request['time_sum'], reverse=True)
@@ -127,20 +128,13 @@ def refresh_ts(path_to_ts_file: str):
     logging.info("TS-file was updated")
 
 
-def build_config(path_to_config):
+def build_config(path_to_config) -> dict:
     try:
         with open(path_to_config, 'r') as f:
             return json.load(f)
     except JSONDecodeError:
         logging.error("Please, check your config")
         raise Exception("Please, check your config")
-
-
-def parse_log(path_to_last_log, report_size):
-    logging.info("Nginx log analyze was started")
-    slow_requests = analyze_log(path_to_last_log, report_size)
-    logging.info("Nginx log analyze was finished")
-    return slow_requests
 
 
 def make_report(path_to_new_daily_report: str, path_to_template, slow_requests):
@@ -160,20 +154,29 @@ def main(config: dict):
         day_of_report = datetime.strftime(about_last_log.date, '%Y.%m.%d')
         path_to_daily_report = '{0}/report-{1}.html'.format(config["REPORT_DIR"], day_of_report)
         if not os.path.exists(path_to_daily_report):
-            report_size = config['REPORT_SIZE']
-            slow_requests = parse_log(about_last_log.path, report_size)
+            logging.info("Nginx log analysis was started")
+            log_rows = read_log(about_last_log.path)
+            slow_requests = analyze_log(log_rows, config['REPORT_SIZE'])
+            logging.info("Nginx log analysis was finished")
+
             make_report(path_to_daily_report, config['REPORT_TEMPLATE'], slow_requests)
-            # Report
-            refresh_ts(config['TS_FILE'])
+            refresh_ts(config['TS_FILE'])  # Report
 
     logging.info("Log analyzer stopped")
 
 
 if __name__ == "__main__":
+    path_to_default_conf = '/path/HW1/local_conf.conf'
+    config = build_config(path_to_default_conf)
+
     m = argparse.ArgumentParser(description="Log analyzer", prog="log_analyzer")
-    m.add_argument("--config", "-c", type=str, default='/path/HW1/local_conf.conf', help="Program config")
+    m.add_argument("--config", "-c", type=str, default=path_to_default_conf, help="Program config")
     options = m.parse_args()
-    config = build_config(options.config)
+    if options.config != path_to_default_conf:
+        # Merge with external config
+        external_conf = build_config(options.config)
+        config.update(external_conf)
+
     configure_logger(config.get('LOG_FILE'))
     try:
         main(config)
