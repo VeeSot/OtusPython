@@ -15,6 +15,8 @@ from json import JSONDecodeError
 from string import Template
 from typing import Union
 
+import sys
+
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 LogInformation = namedtuple('LogInformation', 'date path')
 
@@ -38,7 +40,7 @@ def read_log(path_to_log):
         yield row
 
 
-def analyze_log(rows: Generator, report_size: int):
+def analyze_log(rows: Generator, report_size: int,max_level_of_error=50):
     url_pattern = re.compile('[A-Z]+\s(?P<url>\S+)\sHTTP/\d\.\d.* (?P<t_execution>\d+(\.\d+)?)')
     requests = []
     total_time = 0
@@ -58,7 +60,10 @@ def analyze_log(rows: Generator, report_size: int):
             bad_rows += 1
 
     if bad_rows:
-        logging.info('Were/was skipped {} row(s) from {}'.format(bad_rows,bad_rows+total_matched))
+        percent_of_errors = bad_rows/total_matched * 100
+        if percent_of_errors>max_level_of_error:
+            logging.info('Too many incorrect rows in log.')
+            sys.exit(1)
 
     for url, t_executions in stat.items():
         metrics = {}
