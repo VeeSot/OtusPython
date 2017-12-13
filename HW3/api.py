@@ -13,6 +13,7 @@ from typing import List
 
 from HW3.scoring import get_score
 
+MEANING_OF_LIFE = 42
 SALT = "Otus"
 ADMIN_LOGIN = "admin"
 ADMIN_SALT = "42"
@@ -68,30 +69,33 @@ class Validator:
         self.obj = obj
         self.schema = schema
         self.errors = []
-        self.__validate()
+        self.filled_fields = []
+        self.validate()
 
-    @staticmethod
-    def check(field, name, obj: dict):
+    def __validate(self, field, name, obj: dict):
         value = obj.get(name)
         constrains: List[Field] = filter(lambda v: isinstance(v, Field), field.__dict__.values())
-        errors = []
         for constrain in constrains:
             if constrain.field_type == 'nullable':
                 if not constrain.value:  # Can't be empty
                     if not value:
-                        errors.append('Field {} should be filled'.format(name))
+                        self.errors.append('Field {} should be filled'.format(name))
+                else:
+                    self.filled_fields.append(name)
             elif constrain.field_type == 'required':
                 if constrain.value:
                     if not value:  # Missed in obj
-                        errors.append('Field {} should be exists'.format(name))
-        return errors
+                        self.errors.append('Field {} should be exists'.format(name))
 
-    def __validate(self):
+
+    def get_errors(self):
+        return self.errors
+
+    def validate(self):
         members = inspect.getmembers(self.schema)
         checked_fields = {x[0]: x[1] for x in members if isinstance(x[1], BaseField)}
         for name, field in checked_fields.items():
-            errors = Validator.check(field, name, self.obj)
-            self.errors.extend(filter(lambda x: x, errors))
+            self.__validate(field, name, self.obj)
 
     @property
     def is_valid(self):
@@ -171,10 +175,8 @@ def method_handler(request, ctx, store):
     return response, code
 
 
-def score_handler(request, ctx, store):
+def score_handler(request, ctx: dict, store):
     request_body = request['body']
-    if request_body['login'] == ADMIN_LOGIN:
-        return {"score": 42}
     arguments = request_body['arguments']
     email = arguments.get('email')
     phone = arguments.get('phone')
@@ -182,13 +184,18 @@ def score_handler(request, ctx, store):
     last_name = arguments.get('last_name')
     gender = arguments.get('gender')
     birthday = arguments.get('birthday')
-    enough_information = email and phone or first_name and last_name or gender and birthday
+    enough_information = bool(email and phone) or bool(first_name and last_name) or bool(gender and birthday)
 
     if enough_information:
         online_score_validator = Validator(request, OnlineScoreRequest)
+        filled_fields = online_score_validator.filled_fields
+        ctx.update({'has': filled_fields})
         if online_score_validator.is_valid:
-            score = get_score(store, phone, email, birthday, gender, first_name, last_name)
-            response = {"score": score}
+            if request_body['login'] == ADMIN_LOGIN:
+                response = {"score": MEANING_OF_LIFE}
+            else:
+                score = get_score(store, phone, email, birthday, gender, first_name, last_name)
+                response = {"score": score}
             code = OK
         else:
             errors = online_score_validator.errors
@@ -198,7 +205,7 @@ def score_handler(request, ctx, store):
         response = {"error": "You should to send necessary parameters"}
         code = INVALID_REQUEST
 
-    return response,code
+    return response, code, ctx
 
 
 class MainHTTPHandler(BaseHTTPRequestHandler):
@@ -233,7 +240,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
                 try:
                     method = request['method']
                     handler = self.router[method]
-                    response, code = handler({"body": request, "headers": self.headers}, context, self.store)
+                    response, code, context = handler({"body": request, "headers": self.headers}, context, self.store)
                 except Exception as e:
                     logging.exception("Unexpected error: %s" % e)
                     code = INTERNAL_ERROR
@@ -249,7 +256,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
             r = {"error": response or ERRORS.get(code, "Unknown Error"), "code": code}
         context.update(r)
         logging.info(context)
-        self.wfile.write(json.dumps(r))
+        self.wfile.write(json.dumps(r).encode())
         return
 
 
