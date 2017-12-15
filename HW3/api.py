@@ -170,10 +170,20 @@ def check_auth(request):
 
 
 def clients_interests(request, ctx: dict, store):
-    ids = request['body']['arguments']['client_ids']
-    response = {idx: get_interests(store=store, cid=idx) for idx in ids}
-    ctx.update({'nclients': len(ids)})
-    return response, OK, ctx
+    arguments = request['body'] ['arguments']
+
+    clients_interests_request_validator = Validator(arguments, ClientsInterestsRequest)
+    if clients_interests_request_validator.is_valid:
+        ids =   arguments['client_ids']
+        response = {idx: get_interests(store=store, cid=idx) for idx in ids}
+        code = OK
+        ctx.update({'nclients': len(ids)})
+    else:
+        errors = clients_interests_request_validator.errors
+        response = {"error": errors[0]}
+        code = INVALID_REQUEST
+
+    return response, code, ctx
 
 
 def method_handler(request, ctx, store):
