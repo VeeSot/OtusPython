@@ -11,7 +11,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from optparse import OptionParser
 from typing import List
 
-from HW3.scoring import get_score
+from HW3.scoring import get_score, get_interests
 
 MEANING_OF_LIFE = 42
 SALT = "Otus"
@@ -86,7 +86,6 @@ class Validator:
                 if constrain.value:
                     if not value:  # Missed in obj
                         self.errors.append('Field {} should be exists'.format(name))
-
 
     def get_errors(self):
         return self.errors
@@ -170,9 +169,21 @@ def check_auth(request):
     return False
 
 
+def clients_interests(request, ctx: dict, store):
+    ids = request['body']['arguments']['client_ids']
+    response = {idx: get_interests(store=store, cid=idx) for idx in ids}
+    ctx.update({'nclients': len(ids)})
+    return response, OK, ctx
+
+
 def method_handler(request, ctx, store):
-    response, code = None, None
-    return response, code
+    method = request['body']['method']
+    middleware = {
+        "clients_interests": clients_interests,
+        "online_score": score_handler
+    }
+    handler = middleware[method]
+    return handler(request, ctx, store)
 
 
 def score_handler(request, ctx: dict, store):
@@ -211,7 +222,6 @@ def score_handler(request, ctx: dict, store):
 class MainHTTPHandler(BaseHTTPRequestHandler):
     router = {
         "method": method_handler,
-        "online_score": score_handler
     }
     store = None
 
@@ -238,8 +248,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
             logging.info("%s: %s %s" % (self.path, data_string, context["request_id"]))
             if path in self.router:
                 try:
-                    method = request['method']
-                    handler = self.router[method]
+                    handler = self.router[path]
                     response, code, context = handler({"body": request, "headers": self.headers}, context, self.store)
                 except Exception as e:
                     logging.exception("Unexpected error: %s" % e)
