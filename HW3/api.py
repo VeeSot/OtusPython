@@ -3,160 +3,23 @@
 
 import datetime
 import hashlib
-import inspect
 import json
 import logging
 import uuid
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from optparse import OptionParser
-from typing import List
 
+from HW3.constants import INVALID_REQUEST, OK, MEANING_OF_LIFE, ADMIN_LOGIN, BAD_REQUEST, INTERNAL_ERROR, NOT_FOUND, \
+    ERRORS, ADMIN_SALT, SALT
+
+# sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from HW3.requests import ClientsInterestsRequest, OnlineScoreRequest, MethodRequest
 from HW3.scoring import get_score, get_interests
-
-MEANING_OF_LIFE = 42
-SALT = "Otus"
-ADMIN_LOGIN = "admin"
-ADMIN_SALT = "42"
-OK = 200
-BAD_REQUEST = 400
-FORBIDDEN = 403
-NOT_FOUND = 404
-INVALID_REQUEST = 422
-INTERNAL_ERROR = 500
-ERRORS = {
-    BAD_REQUEST: "Bad Request",
-    FORBIDDEN: "Forbidden",
-    NOT_FOUND: "Not Found",
-    INVALID_REQUEST: "Invalid Request",
-    INTERNAL_ERROR: "Internal Server Error",
-}
-UNKNOWN = 0
-MALE = 1
-FEMALE = 2
-GENDERS = {
-    UNKNOWN: "unknown",
-    MALE: "male",
-    FEMALE: "female",
-}
+from HW3.validator import Validator
 
 
-class Field:
-    def __init__(self, field, value):
-        self.field_type = field
-        self.value = value
-
-
-class BaseField(object):
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            field = Field(k, v)
-            setattr(self, k, field)
-        self.value = None
-
-    def __get__(self, obj, objtype):
-        if obj:
-            return self.value
-        else:
-            # Return constrains for fields
-            return self
-
-    def __set__(self, obj, value):
-        self.value = value
-
-
-class Validator:
-    def __init__(self, obj: dict, schema):
-        self.obj = obj
-        self.schema = schema
-        self.errors = []
-        self.filled_fields = []
-        self.validate()
-
-    def __validate(self, field, name, obj: dict):
-        value = obj.get(name)
-        constrains: List[Field] = filter(lambda v: isinstance(v, Field), field.__dict__.values())
-        for constrain in constrains:
-            if constrain.field_type == 'nullable':
-                if not constrain.value:  # Can't be empty
-                    if not value:
-                        self.errors.append('Field {} should be filled'.format(name))
-                else:
-                    self.filled_fields.append(name)
-            elif constrain.field_type == 'required':
-                if constrain.value:
-                    if not value:  # Missed in obj
-                        self.errors.append('Field {} should be exists'.format(name))
-
-    def get_errors(self):
-        return self.errors
-
-    def validate(self):
-        members = inspect.getmembers(self.schema)
-        checked_fields = {x[0]: x[1] for x in members if isinstance(x[1], BaseField)}
-        for name, field in checked_fields.items():
-            self.__validate(field, name, self.obj)
-
-    @property
-    def is_valid(self):
-        return not self.errors
-
-
-class CharField(BaseField):
+class ShutDownException(Exception):
     pass
-
-
-class ArgumentsField(BaseField):
-    pass
-
-
-class EmailField(CharField):
-    pass
-
-
-class PhoneField(BaseField):
-    pass
-
-
-class DateField(BaseField):
-    pass
-
-
-class BirthDayField(BaseField):
-    pass
-
-
-class GenderField(BaseField):
-    pass
-
-
-class ClientIDsField(BaseField):
-    pass
-
-
-class ClientsInterestsRequest(object):
-    client_ids = ClientIDsField(required=True)
-    date = DateField(required=False, nullable=True)
-
-
-class OnlineScoreRequest(object):
-    first_name = CharField(required=False, nullable=True)
-    last_name = CharField(required=False, nullable=True)
-    email = EmailField(required=False, nullable=True)
-    phone = PhoneField(required=False, nullable=True)
-    birthday = BirthDayField(required=False, nullable=True)
-    gender = GenderField(required=False, nullable=True)
-
-
-class MethodRequest(object):
-    account = CharField(required=False, nullable=True)
-    login = CharField(required=True, nullable=True)
-    token = CharField(required=True, nullable=True)
-    arguments = ArgumentsField(required=True, nullable=True)
-    method = CharField(required=True, nullable=False)
-
-    @property
-    def is_admin(self):
-        return self.login == ADMIN_LOGIN
 
 
 def check_auth(request):
@@ -170,11 +33,11 @@ def check_auth(request):
 
 
 def clients_interests(request, ctx: dict, store):
-    arguments = request['body'] ['arguments']
+    arguments = request['body']['arguments']
 
     clients_interests_request_validator = Validator(arguments, ClientsInterestsRequest)
     if clients_interests_request_validator.is_valid:
-        ids =   arguments['client_ids']
+        ids = arguments['client_ids']
         response = {idx: get_interests(store=store, cid=idx) for idx in ids}
         code = OK
         ctx.update({'nclients': len(ids)})
@@ -190,10 +53,15 @@ def method_handler(request, ctx, store):
     method = request['body']['method']
     middleware = {
         "clients_interests": clients_interests,
-        "online_score": score_handler
+        "online_score": score_handler,
+        "shutdown": score_handler
     }
     handler = middleware[method]
     return handler(request, ctx, store)
+
+
+def shoutdown(*args, **kwargs):
+    raise ShutDownException
 
 
 def score_handler(request, ctx: dict, store):
@@ -279,7 +147,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
         return
 
 
-if __name__ == "__main__":
+def runner():
     op = OptionParser()
     op.add_option("-p", "--port", action="store", type=int, default=8080)
     op.add_option("-l", "--log", action="store", default=None)
@@ -292,4 +160,10 @@ if __name__ == "__main__":
         server.serve_forever()
     except KeyboardInterrupt:
         pass
+    except ShutDownException:
+        logging.info("Bye-Bye")
     server.server_close()
+
+
+if __name__ == "__main__":
+    runner()
