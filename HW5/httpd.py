@@ -1,6 +1,5 @@
 import os
 import socket
-
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from optparse import OptionParser, Values
@@ -15,8 +14,6 @@ def handle_client_connection(client_sock: socket.socket, document_root):
     body = client_sock.recv(1024)
     request = Request(body)
     method, path = request.parse_request()
-    if path.endswith('/'):  # There is directory
-        path += 'index.html'
     path = document_root + path
     response = Response(method, path)
     client_sock.send(response.content)

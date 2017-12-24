@@ -3,3 +3,4 @@
 *.pyc
 *analyzer.log
 *last_report_update.ts
+/HW5/httptest/
