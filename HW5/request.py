@@ -1,4 +1,7 @@
 # Based on https://gist.github.com/chrisguitarguy/1308286
+from typing import Tuple
+
+
 class InvalidRequest(Exception):
     pass
 
@@ -10,7 +13,7 @@ class Request(object):
         self._raw_request = raw_request
 
 
-    def parse_request(self):
+    def parse_request(self)-> Tuple[str, str]:
         "Turn basic request headers in something we can use"
         temp = [i.strip().decode() for i in self._raw_request.splitlines()]
 
@@ -20,4 +23,4 @@ class Request(object):
         # Figure out our request method, path, and which version of HTTP we're using
         method, path, _ = [i.strip() for i in temp[0].split()]
 
-        return method, path,
+        return method, path

@@ -6,7 +6,7 @@ NOT_FOUND = 404
 NOT_ALLOWED = 405
 GET = 'GET'
 HEAD = 'HEAD'
-ALLOWED_METHODS = [GET,HEAD]
+ALLOWED_METHODS = [GET, HEAD]
 http_code_to_description = {OK: 'OK',
                             NOT_FOUND: 'NotFound',
                             NOT_ALLOWED: 'Method Not Allowed'}
