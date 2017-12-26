@@ -1,5 +1,3 @@
-HOST = ''
-PORT = 8080
 CLRF = '\r\n'
 OK = 200
 FORBIDDEN = 403

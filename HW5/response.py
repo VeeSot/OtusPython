@@ -4,7 +4,7 @@ import os
 from collections import namedtuple
 from typing import Optional
 
-from HW5.constants import http_code_to_description, CLRF, ALLOWED_METHODS, OK, NOT_ALLOWED, NOT_FOUND, GET, FORBIDDEN
+from constants import http_code_to_description, CLRF, ALLOWED_METHODS, OK, NOT_ALLOWED, NOT_FOUND, GET, FORBIDDEN
 
 FileDescriber = namedtuple('file_describer', 'content_type,content,length,can_read')
 
