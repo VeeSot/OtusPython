@@ -26,8 +26,7 @@ def handle_client_connection(client_sock: socket.socket, document_root):
     body = socket_reader(client_sock)
     request = Request(body)
     method, path = request.parse_request()
-    path = document_root + path
-    response = Response(method, path)
+    response = Response(method, path,document_root)
     client_sock.send(response.content)
     client_sock.close()
 
