@@ -40,11 +40,13 @@ def file_finder(path) -> Optional[FileDescriber]:
 
 
 class Response:
-    def __init__(self, method, path):
-
+    def __init__(self, method, path,document_root):
+        path = document_root + path
         # HTTP status
         fd = None
-        if method in ALLOWED_METHODS:
+        if not os.path.abspath(path).startswith(document_root):
+            http_code = FORBIDDEN
+        elif method in ALLOWED_METHODS:
             fd = file_finder(path)
             if fd:
                 http_code = OK if fd.can_read else FORBIDDEN

@@ -10,11 +10,11 @@ class Request(object):
         self._raw_request = raw_request
 
     def parse_request(self) -> Tuple[str, str]:
-        "Turn basic request headers in something we can use"
-        temp = [i.strip().decode() for i in self._raw_request.splitlines()]
+        temp = [i.strip().decode() for i in self._raw_request.split(b'\r\n')]
 
-        # Figure out our request method, path, and which version of HTTP we're using
-        method, path, _ = [i.strip() for i in temp[0].split()]
+
+        request = temp[0].split()
+        method, path, _ = [i.strip() for i in request]
 
         # Cleans path
         path = urlparse(path).path
