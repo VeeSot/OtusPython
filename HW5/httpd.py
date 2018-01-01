@@ -7,8 +7,6 @@ from request import Request
 from response import Response
 
 
-
-
 def socket_reader(client_sock) -> tuple:
     client_sock.settimeout(1)
     data = b''
@@ -32,9 +30,9 @@ def socket_reader(client_sock) -> tuple:
 
 
 def write_to_socket(client_sock, data):
-    lengh_of_content = len(data)
+    length_of_content = len(data)
     i = 0
-    while i < lengh_of_content:
+    while i < length_of_content:
         chunk = data[i:i + CHUNK_SIZE]
         bytes_sent = client_sock.send(chunk)
         i += bytes_sent
