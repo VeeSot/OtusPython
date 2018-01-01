@@ -62,11 +62,14 @@ class Response:
         status_description = http_code_to_description[http_code]
         return http_code, status_description, fd
 
+    def set_header(self, header: dict):
+        self._headers.add(header)
+
     def build_server_headers(self):
         time_now = datetime.datetime.now(datetime.timezone.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        self._headers.add({'Date': time_now})
-        self._headers.add({'Server': "I'm Groot"})
-        self._headers.add({'Connection': 'keep-alive'})
+        self.set_header({'Date': time_now})
+        self.set_header({'Server': "I'm Groot"})
+        self.set_header({'Connection': 'keep-alive'})
 
     def set_status_line(self, http_code, status_description):
         self.response += 'HTTP/1.1 {} {}{}'.format(http_code, status_description, CLRF).encode()
@@ -77,18 +80,17 @@ class Response:
     def set_additional_headers(self, fd: FileDescriber, method, path):
         if fd and fd.can_read:
             if fd.content_type:
-                self._headers.add({'Content-Type': fd.content_type})
-                self._headers.add({'Content-Length': '{}'.format(fd.length)})
+                self.set_header({'Content-Type': fd.content_type})
+                self.set_header({'Content-Length': '{}'.format(fd.length)})
             if method == GET:
                 if not ('text' in fd.content_type):
                     # To attach file
                     file_name = path.split('/')[-1]
-                    self._headers.add({'Content-Disposition': 'attachment; filename={}'.format(file_name)})
+                    self.set_header({'Content-Disposition': 'attachment; filename={}'.format(file_name)})
 
     @property
     def content(self) -> bytes:
         return self.response
-
 
     @property
     def headers(self) -> dict:
