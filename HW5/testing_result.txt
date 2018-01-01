@@ -1,3 +1,4 @@
+--5 sockets--
 ab -n 50000 -c 100 -r http://localhost:8080/
 This is ApacheBench, Version 2.3 <$Revision: 1706008 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -22,33 +23,34 @@ Server Hostname:        localhost
 Server Port:            8080
 
 Document Path:          /
-Document Length:        957488 bytes
+Document Length:        132 bytes
 
 Concurrency Level:      100
-Time taken for tests:   35.031 seconds
+Time taken for tests:   1253.364 seconds
 Complete requests:      50000
-Failed requests:        0
-Total transferred:      47881550000 bytes
-HTML transferred:       47874400000 bytes
-Requests per second:    1427.30 [#/sec] (mean)
-Time per request:       70.063 [ms] (mean)
-Time per request:       0.701 [ms] (mean, across all concurrent requests)
-Transfer rate:          1334787.64 [Kbytes/sec] received
+Failed requests:        15
+   (Connect: 0, Receive: 5, Length: 5, Exceptions: 5)
+Total transferred:      13598640 bytes
+HTML transferred:       6599340 bytes
+Requests per second:    39.89 [#/sec] (mean)
+Time per request:       2506.729 [ms] (mean)
+Time per request:       25.067 [ms] (mean, across all concurrent requests)
+Transfer rate:          10.60 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0   36 222.3      0    7015
-Processing:     8   34  32.0     31    3215
-Waiting:        8   32  32.0     30    3214
-Total:          9   69 229.5     31    7052
+Connect:        0    2  43.8      0    1001
+Processing:  1002 2502 1253.3   2382  102587
+Waiting:        0 2492 754.7   2382   54104
+Total:       1003 2504 1271.8   2383  103588
 
 Percentage of the requests served within a certain time (ms)
-  50%     31
-  66%     33
-  75%     34
-  80%     35
-  90%     37
-  95%     41
-  98%   1030
-  99%   1034
- 100%   7052 (longest request)
+  50%   2383
+  66%   2648
+  75%   2797
+  80%   2805
+  90%   2813
+  95%   2818
+  98%   2824
+  99%   2827
+ 100%  103588 (longest request)
