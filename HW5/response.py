@@ -2,7 +2,7 @@ import datetime
 import mimetypes
 import os
 from collections import namedtuple
-from typing import Optional
+from typing import Optional, Tuple
 
 from constants import http_code_to_description, CLRF, ALLOWED_METHODS, OK, NOT_ALLOWED, NOT_FOUND, GET, FORBIDDEN
 
@@ -40,7 +40,12 @@ def file_finder(path) -> Optional[FileDescriber]:
 
 
 class Response:
-    def __init__(self, method, path,document_root):
+    def __init__(self):
+        self.response = b''
+        self._headers = Headers()
+
+    @staticmethod
+    def to_serve_request(method, path, document_root) -> Tuple[int, str, FileDescriber]:
         path = document_root + path
         # HTTP status
         fd = None
@@ -55,31 +60,36 @@ class Response:
         else:
             http_code = NOT_ALLOWED
         status_description = http_code_to_description[http_code]
-        self.response = 'HTTP/1.1 {} {}{}'.format(http_code, status_description, CLRF).encode()
+        return http_code, status_description, fd
 
-        # Headers
+    def build_server_headers(self):
+        time_now = datetime.datetime.now(datetime.timezone.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        self._headers.add({'Date': time_now})
+        self._headers.add({'Server': "I'm Groot"})
+        self._headers.add({'Connection': 'keep-alive'})
+
+    def set_status_line(self, http_code, status_description):
+        self.response += 'HTTP/1.1 {} {}{}'.format(http_code, status_description, CLRF).encode()
+
+    def prepare(self):
+        self.response += self._headers.to_bytes() + CLRF.encode()
+
+    def set_additional_headers(self, fd: FileDescriber, method, path):
         if fd and fd.can_read:
-            headers = Headers()
-            time_now = datetime.datetime.now(datetime.timezone.utc).strftime('%a, %d %b %Y %H:%M:%S GMT')
-            headers.add({'Date': time_now})
-            headers.add({'Content-Length': '{}'.format(fd.length)})
-            headers.add({'Server': "I'm Groot"})
             if fd.content_type:
-                headers.add({'Content-Type': fd.content_type})
-            headers.add({'Connection': 'keep-alive'})
-
+                self._headers.add({'Content-Type': fd.content_type})
+                self._headers.add({'Content-Length': '{}'.format(fd.length)})
             if method == GET:
                 if not ('text' in fd.content_type):
                     # To attach file
                     file_name = path.split('/')[-1]
-                    headers.add({'Content-Disposition': 'attachment; filename={}'.format(file_name)})
-            self.response += headers.to_bytes()
-
-        self.response += CLRF.encode()
-
-        if method == GET and fd and fd.can_read:
-            self.response += fd.content
+                    self._headers.add({'Content-Disposition': 'attachment; filename={}'.format(file_name)})
 
     @property
     def content(self) -> bytes:
         return self.response
+
+
+    @property
+    def headers(self) -> dict:
+        return self._headers.headers
