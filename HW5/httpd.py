@@ -2,33 +2,42 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 from optparse import OptionParser
 
-from constants import REQUEST_URI_TOO_LONG, http_code_to_description, GET
+from constants import REQUEST_URI_TOO_LONG, http_code_to_description, MAX_URI_LENGTH, CHUNK_SIZE
 from request import Request
 from response import Response
+
+
 
 
 def socket_reader(client_sock) -> tuple:
     client_sock.settimeout(1)
     data = b''
-    max_uri_length = 256  # bytes
+
     error_code = None
     try:
         # Read first request line with verb and URI
-        data += client_sock.recv(1024)
+        data += client_sock.recv(CHUNK_SIZE)
         request_line = data.split()
         uri = request_line[1].strip()  # request_line[0] is HTTP verb,request_line[1] is URI
-        if len(uri) > max_uri_length:
+        if len(uri) > MAX_URI_LENGTH:
             error_code = REQUEST_URI_TOO_LONG
             return data, error_code
         while True:
-            buffer = client_sock.recv(1024)
+            buffer = client_sock.recv(CHUNK_SIZE)
             data += buffer
     except socket.timeout:
         pass
-    except Exception as e:
-        print(e)
 
     return data, error_code
+
+
+def write_to_socket(client_sock, data):
+    lengh_of_content = len(data)
+    i = 0
+    while i < lengh_of_content:
+        chunk = data[i:i + CHUNK_SIZE]
+        bytes_sent = client_sock.send(chunk)
+        i += bytes_sent
 
 
 def handle_client_connection(client_sock: socket.socket, document_root):
@@ -50,7 +59,7 @@ def handle_client_connection(client_sock: socket.socket, document_root):
         if fd and fd.content:
             response.response += fd.content
 
-    client_sock.send(response.content)
+    write_to_socket(client_sock, response.content)
     client_sock.close()
 
 
