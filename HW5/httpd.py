@@ -1,9 +1,11 @@
 import logging
+import re
 import socket
 from concurrent.futures import ThreadPoolExecutor
 from optparse import OptionParser
 
-from constants import REQUEST_URI_TOO_LONG, http_code_to_description, MAX_URI_LENGTH, CHUNK_SIZE, INTERNAL_SERVER_ERROR
+from constants import REQUEST_URI_TOO_LONG, http_code_to_description, MAX_URI_LENGTH, CHUNK_SIZE, INTERNAL_SERVER_ERROR, \
+    ALLOWED_METHODS, NOT_ALLOWED
 from request import Request
 from response import Response
 
@@ -11,13 +13,26 @@ from response import Response
 def socket_reader(client_sock) -> tuple:
     client_sock.settimeout(1)
     data = b''
-
+    request_line = b'(?P<http_verb>[A-Z]{3,7}) (?P<uri>\/.+) HTTP/1.[0,1](\\r)?\\n'
     error_code = None
+    # HTTP verb has maximal size equal 7 bytes,
+    # URI SHOULD contains max 255 bytes,
+    # PROTOCOL+version is 8 symbols
+    # [CL]RF is 2 symbols
+    # 2 symbols for spaces
+    max_request_length = 274
+    # Read first request line with verb and URI
+    data += client_sock.recv(max_request_length)
+    match = re.search(request_line, data)
+    if match:
+        uri = match.group('uri')
+        http_verb = match.group('http_verb').decode()
+        if not (http_verb in ALLOWED_METHODS):
+            return data, NOT_ALLOWED
+    else:
+        raise Exception("Request {} is incorrect.".format(data.decode()))
+
     try:
-        # Read first request line with verb and URI
-        data += client_sock.recv(CHUNK_SIZE)
-        request_line = data.split()
-        uri = request_line[1].strip()  # request_line[0] is HTTP verb,request_line[1] is URI
         if len(uri) > MAX_URI_LENGTH:
             error_code = REQUEST_URI_TOO_LONG
             return data, error_code
@@ -30,15 +45,6 @@ def socket_reader(client_sock) -> tuple:
     return data, error_code
 
 
-def write_to_socket(client_sock, data):
-    length_of_content = len(data)
-    i = 0
-    while i < length_of_content:
-        chunk = data[i:i + CHUNK_SIZE]
-        bytes_sent = client_sock.send(chunk)
-        i += bytes_sent
-
-
 def handle_client_connection(client_sock: socket.socket, document_root):
     response = Response()
     response.build_server_headers()
@@ -48,19 +54,18 @@ def handle_client_connection(client_sock: socket.socket, document_root):
         if error_code:
             status_description = http_code_to_description[error_code]
             response.set_status_line(error_code, status_description)
+            response.set_header({'Content-Type': 'text/html'})
+            response.set_header({'Content-Length': 0})
             response.prepare()
         else:
             request = Request(body)
             method, path = request.parse_request()
-            http_code, status_description, fd = response.to_serve_request(method, path, document_root)
+            http_code, status_description, fd = response.to_serve_request(path, document_root)
             response.set_status_line(http_code, status_description)
             response.set_additional_headers(fd, method, path)
             response.prepare()
             if fd and fd.content:
                 response.response += fd.content
-
-        write_to_socket(client_sock, response.content)
-        client_sock.close()
     except Exception as e:
         logging.exception(e, exc_info=True)
         error_code = INTERNAL_SERVER_ERROR
@@ -73,7 +78,8 @@ def handle_client_connection(client_sock: socket.socket, document_root):
         response.set_header({'Content-Length': len(message)})
         response.prepare()
         response.response += message
-        write_to_socket(client_sock, response.content)
+    finally:
+        client_sock.sendall(response.content)
         client_sock.close()
 
 

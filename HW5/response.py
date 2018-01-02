@@ -45,20 +45,18 @@ class Response:
         self._headers = Headers()
 
     @staticmethod
-    def to_serve_request(method, path, document_root) -> Tuple[int, str, FileDescriber]:
+    def to_serve_request(path, document_root) -> Tuple[int, str, FileDescriber]:
         path = document_root + path
         # HTTP status
         fd = None
         if not os.path.abspath(path).startswith(document_root):
             http_code = FORBIDDEN
-        elif method in ALLOWED_METHODS:
+        else:
             fd = file_finder(path)
             if fd:
                 http_code = OK if fd.can_read else FORBIDDEN
             else:
                 http_code = NOT_FOUND
-        else:
-            http_code = NOT_ALLOWED
         status_description = http_code_to_description[http_code]
         return http_code, status_description, fd
 

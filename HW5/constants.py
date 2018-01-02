@@ -1,10 +1,12 @@
 OK = 200
+BAD_REQUEST = 400
 FORBIDDEN = 403
 NOT_FOUND = 404
 NOT_ALLOWED = 405
 REQUEST_URI_TOO_LONG = 414
 INTERNAL_SERVER_ERROR = 500
 http_code_to_description = {OK: 'OK',
+                            BAD_REQUEST:'Bad Request',
                             REQUEST_URI_TOO_LONG: 'Request-URI Too Long',
                             INTERNAL_SERVER_ERROR: 'Internal Server Error',
                             FORBIDDEN: 'FORBIDDEN',
